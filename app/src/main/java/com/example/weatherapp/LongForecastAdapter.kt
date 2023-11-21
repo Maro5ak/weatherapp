@@ -8,21 +8,21 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class ShortForecastAdapter(private val dataSet : ArrayList<ShortForecastItem>) : RecyclerView.Adapter<ShortForecastAdapter.ViewHolder>() {
+class LongForecastAdapter(private val dataSet: ArrayList<LongForecastItem>) : RecyclerView.Adapter<LongForecastAdapter.ViewHolder>() {
     class ViewHolder(view : View) : RecyclerView.ViewHolder(view){
-        val timeView : TextView
+        val dayView : TextView
         val imageView: ImageView
-        val tempView: TextView
+        val summaryView: TextView
         init{
-            timeView = view.findViewById(R.id.timeText)
-            imageView = view.findViewById(R.id.forecastShortIcon)
-            tempView = view.findViewById(R.id.temperatureText)
+            dayView = view.findViewById(R.id.dayView)
+            imageView = view.findViewById(R.id.longIcon)
+            summaryView = view.findViewById(R.id.summaryText)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.row_item, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.long_row_item, parent, false)
         )
     }
 
@@ -30,9 +30,9 @@ class ShortForecastAdapter(private val dataSet : ArrayList<ShortForecastItem>) :
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val time = dataSet[position].time
-        holder.timeView.text = "$time:00"
+        holder.dayView.text = dataSet[position].day
         holder.imageView.setImageResource(dataSet[position].icon)
-        holder.tempView.text = "${dataSet[position].temperature}°C"
+        holder.summaryView.text = "L: ${dataSet[position].low}°C | A: ${dataSet[position].expected}°C | H: ${dataSet[position].high}°C"
+
     }
 }
