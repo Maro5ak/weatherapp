@@ -6,4 +6,13 @@
     <string name="countryHint">Country (CZ, UK, …)</string>
     <string name="btnAdd">Add</string>
     <string name="btnCancel">Cancel</string>
+    <string name="kmh">KM/H</string>
+    <string name="wind">Wind</string>
+    <string name="gusts">Gusts</string>
+    <string name="feel">Feels like</string>
+    <string name="humidity">Humidity</string>
+    <string name="more">More data</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="time">(My time)</string>
 </resources>

@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import java.time.LocalTime
 
 class LongForecastAdapter(private val dataSet: ArrayList<LongForecastItem>) : RecyclerView.Adapter<LongForecastAdapter.ViewHolder>() {
     class ViewHolder(view : View) : RecyclerView.ViewHolder(view){
@@ -33,6 +35,11 @@ class LongForecastAdapter(private val dataSet: ArrayList<LongForecastItem>) : Re
         holder.dayView.text = dataSet[position].day
         holder.imageView.setImageResource(dataSet[position].icon)
         holder.summaryView.text = "L: ${dataSet[position].low}°C | A: ${dataSet[position].expected}°C | H: ${dataSet[position].high}°C"
-
+        var color = ContextCompat.getColor(holder.itemView.context, R.color.text_def)
+        if(LocalTime.now().isAfter(LocalTime.of(MainActivity.SWAP_TIME, 0))){
+            color = ContextCompat.getColor(holder.itemView.context, R.color.text_night)
+        }
+        holder.dayView.setTextColor(color)
+        holder.summaryView.setTextColor(color)
     }
 }

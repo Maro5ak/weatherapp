@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,9 +15,11 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.time.LocalTime
 
 
 class AddCityFragment : DialogFragment(){
@@ -37,7 +41,7 @@ class AddCityFragment : DialogFragment(){
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
 
-            val builder = AlertDialog.Builder(it)
+            val builder = AlertDialog.Builder(it, R.style.TransparentDialog)
             val inflater = requireActivity().layoutInflater
             val view = inflater.inflate(R.layout.city_add, null)
             val cityInput = view.findViewById<EditText>(R.id.cityAddInput)
@@ -53,7 +57,6 @@ class AddCityFragment : DialogFragment(){
             view.findViewById<Button>(R.id.btnCancel).setOnClickListener{
                 dialog?.dismiss()
             }
-
             builder.setView(view)
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
@@ -98,6 +101,13 @@ class WeatherSelect : AppCompatActivity(), AddCityFragment.DialogListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather_select)
+        if(LocalTime.now().isBefore(LocalTime.of(MainActivity.SWAP_TIME, 0))){
+            findViewById<ConstraintLayout>(R.id.weatherLayout).setBackgroundResource(R.drawable.gradient)
+        }
+        else{
+            findViewById<ConstraintLayout>(R.id.weatherLayout).setBackgroundResource(R.drawable.gradient_night)
+        }
+
         recycler = findViewById(R.id.cityList)
         arrayList = ArrayList()
         val shared = getSharedPreferences("MainActivity", Context.MODE_PRIVATE)

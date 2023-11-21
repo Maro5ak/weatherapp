@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import java.time.LocalTime
 
 class ShortForecastAdapter(private val dataSet : ArrayList<ShortForecastItem>) : RecyclerView.Adapter<ShortForecastAdapter.ViewHolder>() {
     class ViewHolder(view : View) : RecyclerView.ViewHolder(view){
@@ -34,5 +36,11 @@ class ShortForecastAdapter(private val dataSet : ArrayList<ShortForecastItem>) :
         holder.timeView.text = "$time:00"
         holder.imageView.setImageResource(dataSet[position].icon)
         holder.tempView.text = "${dataSet[position].temperature}°C"
+        var color = ContextCompat.getColor(holder.itemView.context, R.color.text_def)
+        if(LocalTime.now().isAfter(LocalTime.of(MainActivity.SWAP_TIME, 0))){
+            color = ContextCompat.getColor(holder.itemView.context, R.color.text_night)
+        }
+        holder.timeView.setTextColor(color)
+        holder.tempView.setTextColor(color)
     }
 }

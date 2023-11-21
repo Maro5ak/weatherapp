@@ -12,12 +12,16 @@ import android.view.MenuItem
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import java.time.Instant
+import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
 import java.util.Date
@@ -26,6 +30,7 @@ interface ResponseCallback{
     fun onShortResponseSuccess(json: String, country: String)
     fun onFullResponseSuccess(json: String, country: String)
 }
+
 class MainActivity : AppCompatActivity(), ResponseCallback {
     private val parser = JSONParser()
     private lateinit var recycler : RecyclerView
@@ -103,11 +108,15 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateCurrentTemps(low : Int, high : Int, temp: Int, weather : String, city: String, country: String){
+    private fun updateCurrentTemps(low : Int, high : Int, temp: Int, weather : String, city: String, country: String, wind: Int, feels: Int, sunrise: String, sunset: String){
         findViewById<TextView>(R.id.cityText).text = city
         findViewById<TextView>(R.id.currentWeatherText).text = weather
         findViewById<TextView>(R.id.currentTempText).text = "$temp°C"
         findViewById<TextView>(R.id.highLowText).text = "H: $high°C | L: $low°C"
+        findViewById<TextView>(R.id.windSpeedText).text = wind.toString()
+        findViewById<TextView>(R.id.feelsLikeText).text = "$feels°C"
+        findViewById<TextView>(R.id.sunriseText).text = sunrise
+        findViewById<TextView>(R.id.sunsetText).text = sunset
 
         val shared = this.getPreferences(MODE_PRIVATE)
         with(shared.edit()){
@@ -118,6 +127,18 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        var textColor = ContextCompat.getColor(this, R.color.text_def)
+        var cardColor = ContextCompat.getColor(this, R.color.card_def)
+        if(LocalTime.now().isBefore(LocalTime.of(SWAP_TIME, 0))){
+            findViewById<ConstraintLayout>(R.id.parentLayout).setBackgroundResource(R.drawable.gradient)
+        }
+        else {
+            findViewById<ConstraintLayout>(R.id.parentLayout).setBackgroundResource(R.drawable.gradient_night)
+            textColor = ContextCompat.getColor(this, R.color.text_night)
+            cardColor = ContextCompat.getColor(this, R.color.card_night)
+        }
+        setColor(textColor)
+        setCardColor(cardColor)
         val manager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         val managerLong = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recycler = findViewById(R.id.forecastShortList)
@@ -152,7 +173,7 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
     private fun updateShort(currentJson: String, country: String){
         val currentForecast = parser.parseForecastCurrent(currentJson, country)
 
-        updateCurrentTemps(currentForecast.low, currentForecast.high, currentForecast.temp, currentForecast.current, currentForecast.city, currentForecast.country)
+        updateCurrentTemps(currentForecast.low, currentForecast.high, currentForecast.temp, currentForecast.current, currentForecast.city, currentForecast.country, currentForecast.wind, currentForecast.feelsLike, currentForecast.sunrise, currentForecast.sunset)
     }
     private fun updateLong(longJson: String, country : String){
         val longForecast = parser.parseForecastLong(longJson, country)
@@ -171,6 +192,7 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
             val day = calendar.get(Calendar.DAY_OF_WEEK)
             if(lastDay != day || index == longForecast.size - 1) {
                 if(lastDay != 0) {
+                    if(count == 0) count = 1
                     longDataset.add(LongForecastItem(if(lastDay == today) "Today" else get(lastDay), IconMap.get(i.icon),
                         avgDayTempLow / count,
                         avgDayTempHigh / count,
@@ -203,7 +225,8 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
     }
 
 
-    companion object DayMap{
+    companion object{
+        const val SWAP_TIME = 18
         private val map = hashMapOf(
             Pair(1, "Sun"),
             Pair(2, "Mon"),
@@ -229,5 +252,28 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
         updateLong(json, country)
         longDone = true
         if(shortDone) loadingDialog.cancel()
+    }
+
+    private fun setColor(color: Int){
+        findViewById<TextView>(R.id.sunriseText).setTextColor(color)
+        findViewById<TextView>(R.id.sunsetText).setTextColor(color)
+        findViewById<TextView>(R.id.feelsLikeText).setTextColor(color)
+        findViewById<TextView>(R.id.windSpeedText).setTextColor(color)
+        findViewById<TextView>(R.id.windSpeedUnitText).setTextColor(color)
+        findViewById<TextView>(R.id.windText).setTextColor(color)
+        findViewById<TextView>(R.id.feelsLikeHeaderText).setTextColor(color)
+        findViewById<TextView>(R.id.sunriseHeaderText).setTextColor(color)
+        findViewById<TextView>(R.id.sunsetHeaderText).setTextColor(color)
+        findViewById<TextView>(R.id.cityText).setTextColor(color)
+        findViewById<TextView>(R.id.currentTempText).setTextColor(color)
+        findViewById<TextView>(R.id.highLowText).setTextColor(color)
+        findViewById<TextView>(R.id.currentWeatherText).setTextColor(color)
+        findViewById<TextView>(R.id.sunriseTimeNote).setTextColor(color)
+        findViewById<TextView>(R.id.sunsetTimeNote).setTextColor(color)
+    }
+    private fun setCardColor(color: Int){
+        findViewById<CardView>(R.id.shortListCard).setCardBackgroundColor(color)
+        findViewById<CardView>(R.id.longListCard).setCardBackgroundColor(color)
+        findViewById<CardView>(R.id.moreDataCard).setCardBackgroundColor(color)
     }
 }
