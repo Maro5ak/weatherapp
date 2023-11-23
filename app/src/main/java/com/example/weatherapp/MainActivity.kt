@@ -226,7 +226,7 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
 
 
     companion object{
-        const val SWAP_TIME = 18
+        const val SWAP_TIME = 16
         private val map = hashMapOf(
             Pair(1, "Sun"),
             Pair(2, "Mon"),
