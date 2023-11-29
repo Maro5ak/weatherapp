@@ -120,19 +120,23 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
 
 
     fun apiCall(index : Int? = null){
-        longJson = null
-        shortJson = null
-        val shared = this.getPreferences(Context.MODE_PRIVATE) ?: return
-        if(index != null)
-            currentIndex = index
-        val csv = shared.getString(currentIndex.toString(), "").toString()
-        val csvSplit = csv.splitToSequence(";")
-        val city = csvSplit.elementAt(0)
-        val country = csvSplit.elementAt(1)
+        try {
+            longJson = null
+            shortJson = null
+            val shared = this.getPreferences(Context.MODE_PRIVATE) ?: return
+            if (index != null)
+                currentIndex = index
+            val csv = shared.getString(currentIndex.toString(), "").toString()
+            val csvSplit = csv.splitToSequence(";")
+            val city = csvSplit.elementAt(0)
+            val country = csvSplit.elementAt(1)
 
-        getFullForecast(city, country, this)
-        getCurrentForecast(city, country, this)
-
+            getFullForecast(city, country, this)
+            getCurrentForecast(city, country, this)
+        }
+        catch(e: Exception){
+            Log.e("Error", "No weather data found!")
+        }
     }
 
     companion object{
