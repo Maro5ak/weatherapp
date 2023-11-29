@@ -1,8 +1,10 @@
 package com.example.weatherapp
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -11,6 +13,8 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.navigationrail.NavigationRailView
 
 interface ResponseCallback{
     fun onShortResponseSuccess(json: String, country: String)
@@ -22,6 +26,8 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
 
     private var shortJson : String? = null
     private var longJson : String? = null
+    private lateinit var navBar : BottomNavigationView
+    private lateinit var navBarLand : NavigationRailView
 
     private fun getCurrentForecast(cityName: String, country: String, callback: ResponseCallback){
 
@@ -59,10 +65,17 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
 
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val navBar = findViewById<BottomNavigationView>(R.id.navBar)
+
+        navBar = findViewById(R.id.navBar)
+        navBarLand = findViewById(R.id.navBarLand)
+
         navBar.setOnItemSelectedListener {
             when (it.itemId){
                 R.id.bar0 -> {
@@ -73,10 +86,34 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
                     fragmentLoad(WeatherSelect())
                     true
                 }
+                R.id.bar2 -> {
+                    fragmentLoad(CityAddFragment())
+                    true
+                }
                 else -> false
             }
 
         }
+
+        navBarLand.setOnItemSelectedListener {
+            when (it.itemId){
+                R.id.bar0 -> {
+                    apiCall()
+                    true
+                }
+                R.id.bar1 -> {
+                    fragmentLoad(WeatherSelect())
+                    true
+                }
+                R.id.bar2 -> {
+                    fragmentLoad(CityAddFragment())
+                    true
+                }
+                else -> false
+            }
+
+        }
+
 
         apiCall()
     }
@@ -118,6 +155,8 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
     private fun fragmentLoad(fragment : Fragment, args : Bundle? = null){
         fragment.arguments = args
         supportFragmentManager.beginTransaction().replace(R.id.currentFragment, fragment).commit()
+        if(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+            supportFragmentManager.beginTransaction().replace(R.id.landscapeFragment, WeatherSelect()).commit()
     }
 
     override fun onShortResponseSuccess(json: String, country: String) {

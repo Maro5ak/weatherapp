@@ -1,5 +1,6 @@
 package com.example.weatherapp
 
+import org.json.JSONArray
 import org.json.JSONObject
 import java.security.Timestamp
 import java.time.Instant
@@ -59,5 +60,18 @@ class JSONParser {
             res.add(parseForecast(jsonArray[i].toString(), country, city))
         }
         return res
+    }
+
+    fun parseCityNames(json: String) : ArrayList<CityAddItem>{
+        val result = ArrayList<CityAddItem>()
+        val parentJson = JSONArray(json)
+
+        for(i in 0 until parentJson.length()){
+            val jsonObject = parentJson.getJSONObject(i)
+
+            result.add(CityAddItem(jsonObject.getString("name"), jsonObject.getString("country")))
+        }
+        return result
+
     }
 }

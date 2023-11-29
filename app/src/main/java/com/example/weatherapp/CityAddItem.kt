@@ -1,4 +1,4 @@
 package com.example.weatherapp
 
-class CityAddItem {
+class CityAddItem(val cityName : String, val country : String) {
 }

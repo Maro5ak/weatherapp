@@ -25,66 +25,23 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.time.LocalTime
 
-
-class AddCityFragment : DialogFragment(){
-
-    private lateinit var listener: DialogListener
-    interface DialogListener{
-        fun onDialogPositiveClick(city: String, country: String)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            listener = context as DialogListener
-        } catch (e: ClassCastException) {
-            throw ClassCastException(("$context must implement DialogListener"))
-        }
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return activity?.let {
-
-            val builder = AlertDialog.Builder(it, R.style.TransparentDialog)
-            val inflater = requireActivity().layoutInflater
-            val view = inflater.inflate(R.layout.city_add, null)
-            val cityInput = view.findViewById<EditText>(R.id.cityAddInput)
-            val countryInput = view.findViewById<EditText>(R.id.countryAddInput)
-            view.findViewById<Button>(R.id.btnAdd).setOnClickListener{
-                if(cityInput.text.isNotEmpty() && countryInput.text.isNotEmpty())
-                    listener.onDialogPositiveClick(cityInput.text.toString(), countryInput.text.toString().lowercase())
-                else
-                    Toast.makeText(context, "Invalid City or Country!", Toast.LENGTH_SHORT).show()
-                dialog?.dismiss()
-            }
-
-            view.findViewById<Button>(R.id.btnCancel).setOnClickListener{
-                dialog?.dismiss()
-            }
-            builder.setView(view)
-            builder.create()
-        } ?: throw IllegalStateException("Activity cannot be null")
-
-    }
-}
-
-class WeatherSelect : Fragment(), AddCityFragment.DialogListener {
+class WeatherSelect : Fragment() {
 
     private lateinit var recycler : RecyclerView
     private lateinit var adapter : CitySelectAdapter
     private lateinit var arrayList : ArrayList<CitySelectItem>
 
-    override fun onDialogPositiveClick(city: String, country: String) {
-        arrayList.add(CitySelectItem(arrayList.size, city, country, 0))
-        val shared = context?.getSharedPreferences("MainActivity", MODE_PRIVATE) ?: return
-        with(shared.edit()){
-            val index = arrayList.size
-            putInt("count", index)
-            putString((index-1).toString(), "$city;$country;0;0;0;")
-            commit()
-        }
-        update()
-    }
+//    override fun onDialogPositiveClick(city: String, country: String) {
+//        arrayList.add(CitySelectItem(arrayList.size, city, country, 0))
+//        val shared = context?.getSharedPreferences("MainActivity", MODE_PRIVATE) ?: return
+//        with(shared.edit()){
+//            val index = arrayList.size
+//            putInt("count", index)
+//            putString((index-1).toString(), "$city;$country;0;0;0;")
+//            commit()
+//        }
+//        update()
+//    }
 
 
 
