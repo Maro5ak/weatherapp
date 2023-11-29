@@ -3,20 +3,24 @@ package com.example.weatherapp
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.time.LocalTime
@@ -64,7 +68,7 @@ class AddCityFragment : DialogFragment(){
     }
 }
 
-class WeatherSelect : AppCompatActivity(), AddCityFragment.DialogListener {
+class WeatherSelect : Fragment(), AddCityFragment.DialogListener {
 
     private lateinit var recycler : RecyclerView
     private lateinit var adapter : CitySelectAdapter
@@ -72,7 +76,7 @@ class WeatherSelect : AppCompatActivity(), AddCityFragment.DialogListener {
 
     override fun onDialogPositiveClick(city: String, country: String) {
         arrayList.add(CitySelectItem(arrayList.size, city, country, 0))
-        val shared = getSharedPreferences("MainActivity", MODE_PRIVATE)
+        val shared = context?.getSharedPreferences("MainActivity", MODE_PRIVATE) ?: return
         with(shared.edit()){
             val index = arrayList.size
             putInt("count", index)
@@ -82,35 +86,26 @@ class WeatherSelect : AppCompatActivity(), AddCityFragment.DialogListener {
         update()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId){
-            R.id.menuAdd -> {
-                AddCityFragment().show(supportFragmentManager, "city")
-                return true
-            }
 
-            else -> super.onOptionsItemSelected(item)
-        }
 
-    }
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.list_menu_bar, menu)
-        return true
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.activity_weather_select, container, false)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_weather_select)
         if(LocalTime.now().isBefore(LocalTime.of(MainActivity.SWAP_TIME, 0))){
-            findViewById<ConstraintLayout>(R.id.weatherLayout).setBackgroundResource(R.drawable.gradient)
+            view.findViewById<ConstraintLayout>(R.id.weatherLayout).setBackgroundResource(R.drawable.gradient)
         }
         else{
-            findViewById<ConstraintLayout>(R.id.weatherLayout).setBackgroundResource(R.drawable.gradient_night)
+            view.findViewById<ConstraintLayout>(R.id.weatherLayout).setBackgroundResource(R.drawable.gradient_night)
         }
 
-        recycler = findViewById(R.id.cityList)
+        recycler = view.findViewById(R.id.cityList)
         arrayList = ArrayList()
-        val shared = getSharedPreferences("MainActivity", Context.MODE_PRIVATE)
+        val shared = context?.getSharedPreferences("MainActivity", MODE_PRIVATE) ?: return
         val toLoad = shared.getInt("count", 0)
         for(i in 0 until toLoad){
             val csv = shared.getString(i.toString(), "").toString()
@@ -118,7 +113,7 @@ class WeatherSelect : AppCompatActivity(), AddCityFragment.DialogListener {
             arrayList.add(CitySelectItem(i, info.elementAt(0), info.elementAt(1), info.elementAt(2).toInt()))
         }
 
-        val manager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        val manager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         recycler.layoutManager = manager
 
         update()
@@ -129,11 +124,8 @@ class WeatherSelect : AppCompatActivity(), AddCityFragment.DialogListener {
         adapter = CitySelectAdapter(arrayList)
         recycler.adapter = adapter
         adapter.onItemClick = {
-            val tmp = Intent()
-            tmp.putExtra("activity", 0)
-            tmp.putExtra("data", it.index)
-            setResult(RESULT_OK, tmp)
-            finish()
+            (context as MainActivity).apiCall(it.index)
+
         }
     }
 }

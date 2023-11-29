@@ -15,4 +15,9 @@
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
     <string name="time">(My time)</string>
+    <string name="bar0">Forecast</string>
+    <string name="bar1">Choose City</string>
+    <string name="loading">Loading data…</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
