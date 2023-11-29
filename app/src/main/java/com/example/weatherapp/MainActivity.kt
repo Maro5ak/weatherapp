@@ -65,10 +65,6 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
 
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -113,7 +109,14 @@ class MainActivity : AppCompatActivity(), ResponseCallback {
             }
 
         }
-
+        val shared = this.getPreferences(Context.MODE_PRIVATE) ?: return
+        val countCheck = shared.getInt("count", -1)
+        if(countCheck == -1){
+            with(shared.edit()){
+                putInt("count", 0)
+                commit()
+            }
+        }
 
         apiCall()
     }

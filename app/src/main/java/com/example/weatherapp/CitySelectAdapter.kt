@@ -17,6 +17,7 @@ import java.util.Calendar
 
 class CitySelectAdapter(private val dataSet: ArrayList<CitySelectItem>) : RecyclerView.Adapter<CitySelectAdapter.ViewHolder>() {
     var onItemClick: ((CitySelectItem) -> Unit)? = null
+    var onItemLongClick: ((CitySelectItem) -> Unit)? = null
     inner class ViewHolder(view : View) : RecyclerView.ViewHolder(view){
         val cityView : TextView
         val tempView : TextView
@@ -29,6 +30,10 @@ class CitySelectAdapter(private val dataSet: ArrayList<CitySelectItem>) : Recycl
             background = view.findViewById(R.id.rootLayout)
             view.setOnClickListener{
                 onItemClick?.invoke(dataSet[adapterPosition])
+            }
+            view.setOnLongClickListener {
+                onItemLongClick?.invoke(dataSet[adapterPosition])
+                true
             }
         }
     }

@@ -64,10 +64,10 @@ class CityAddFragment : Fragment(), OnQueryTextListener {
                 val index = shared.getInt("count", -1) + 1
 
                 putInt("count", index)
-                putString((index-1).toString(), "${it.cityName};${it.country};0;0;0;")
+                putString((index-1).toString(), "${it.cityName};${it.country};0;0;0;false;")
                 apply()
-                (context as MainActivity).findViewById<BottomNavigationView>(R.id.navBar).selectedItemId = R.id.bar1
             }
+            (context as MainActivity).findViewById<BottomNavigationView>(R.id.navBar).selectedItemId = R.id.bar1
         }
     }
 

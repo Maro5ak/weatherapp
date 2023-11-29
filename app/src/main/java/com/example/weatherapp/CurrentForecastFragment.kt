@@ -74,7 +74,7 @@ class CurrentForecastFragment : Fragment(R.layout.fragment_current_forecast) {
 
         val shared = context?.getSharedPreferences("MainActivity", AppCompatActivity.MODE_PRIVATE) ?: return
         with(shared.edit()){
-            putString(currentIndex.toString(), "$city;$country;$temp;$high;$low;")
+            putString(currentIndex.toString(), "$city;$country;$temp;$high;$low;false;")
             commit()
         }
     }

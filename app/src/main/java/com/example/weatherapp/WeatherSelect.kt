@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.time.LocalTime
 
+
 class WeatherSelect : Fragment() {
 
     private lateinit var recycler : RecyclerView
@@ -67,7 +68,8 @@ class WeatherSelect : Fragment() {
         for(i in 0 until toLoad){
             val csv = shared.getString(i.toString(), "").toString()
             val info = csv.splitToSequence(";")
-            arrayList.add(CitySelectItem(i, info.elementAt(0), info.elementAt(1), info.elementAt(2).toInt()))
+            if(info.elementAt(5) == "false")
+                arrayList.add(CitySelectItem(i, info.elementAt(0), info.elementAt(1), info.elementAt(2).toInt()))
         }
 
         val manager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -82,7 +84,37 @@ class WeatherSelect : Fragment() {
         recycler.adapter = adapter
         adapter.onItemClick = {
             (context as MainActivity).apiCall(it.index)
-
         }
+        adapter.onItemLongClick = {
+            confirmDelete(it)
+        }
+
+    }
+
+    private fun onDialogPositive(item: CitySelectItem) {
+        arrayList.remove(item)
+        val shared = context?.getSharedPreferences("MainActivity", MODE_PRIVATE) ?: return
+        with(shared.edit()){
+            putString(item.index.toString(), "${item.name};${item.country};0;0;0;true;")
+            commit()
+        }
+        update()
+    }
+
+
+
+
+    private fun confirmDelete(item: CitySelectItem){
+        val alertDialogBuilder = AlertDialog.Builder(requireContext())
+        alertDialogBuilder.setMessage("Are you sure you want to delete ${item.name}?")
+        alertDialogBuilder.setPositiveButton("Yes") { _, _ ->
+            onDialogPositive(item)
+        }
+        alertDialogBuilder.setNegativeButton("No") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
     }
 }
